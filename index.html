@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAC TACTICAL HUB | リアルタイム・スコア</title>
+<title>CAC TACTICAL HUB</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- 共通CSSの読み込み -->
@@ -30,7 +30,7 @@
     <!-- Tab Navigation (2 Tabs for viewers: Ranking & Teams) -->
     <div class="grid grid-cols-2 gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs font-bold text-center">
       <button id="tab-ranking" onclick="switchTab('ranking')" class="py-2.5 rounded-md bg-amber-500 text-slate-950 shadow transition">
-        <i class="fa-solid fa-trophy block text-sm mb-0.5"></i>リアルタイム順位
+        <i class="fa-solid fa-trophy block text-sm mb-0.5"></i>順位
       </button>
       <button id="tab-teams" onclick="switchTab('teams')" class="py-2.5 rounded-md text-slate-400 hover:text-slate-200 transition">
         <i class="fa-solid fa-users block text-sm mb-0.5"></i>チーム編成
@@ -41,7 +41,6 @@
     <section id="sec-ranking" class="space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-slate-300">個人（ユーザー）順位</h2>
-        <span id="total-players-count" class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">参加者: 0名</span>
       </div>
 
       <div id="ranking-list" class="space-y-2">
