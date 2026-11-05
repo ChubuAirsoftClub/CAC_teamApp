@@ -113,7 +113,7 @@ function render() {
       
       let membersHTML = teamMembers.map(m => `
         <span class="inline-flex items-center gap-1 bg-slate-800 text-slate-200 text-xs px-2 py-1 rounded border border-slate-700">
-          ${escapeHtml(m.name)} (Lv.${m.level || 1})
+          ${escapeHtml(m.name)}
         </span>
       `).join(' ');
 
@@ -122,7 +122,6 @@ function render() {
       card.innerHTML = `
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
           <span class="font-bold text-sm px-2.5 py-1 rounded-full border ${badgeClass}"><i class="fa-solid fa-users text-xs mr-1.5"></i>${escapeHtml(t.name)} (${teamMembers.length}名)</span>
-          <span class="text-xs bg-slate-700 text-slate-300 border border-slate-600 px-2 py-0.5 rounded-full font-bold">Total Lv.${totalLevel}</span>
         </div>
         <div class="flex flex-wrap gap-1.5 pt-1">${membersHTML}</div>
       `;
