@@ -64,7 +64,8 @@ function render() {
   if(players.length === 0) {
     rankingList.innerHTML = '<div class="text-center text-slate-500 py-8 text-sm">部員が登録されていません</div>';
   } else {
-    const sorted = [...players].sort((a,b) => b.points - a.points);
+    const activePlayers = players.filter(p => p.active !== false);
+    const sorted = [...activePlayers].sort((a,b) => b.points - a.points);
     let currentRank = 1;
 
     sorted.forEach((p, idx) => {
@@ -104,7 +105,7 @@ function render() {
     teamsContainer.innerHTML = '<div class="text-slate-500 italic text-xs">チームが登録されていません</div>';
   } else {
     teams.forEach(t => {
-      const teamMembers = players.filter(p => p.teamId === t.id);
+      const teamMembers = players.filter(p => p.teamId === t.id && p.active !== false);
       const totalLevel = teamMembers.reduce((sum, m) => sum + (parseInt(m.level) || 1), 0);
       const badgeClass = getTeamBadgeClass(t.color);
 
