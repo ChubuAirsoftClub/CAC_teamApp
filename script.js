@@ -80,6 +80,7 @@ async function saveData() {
       teams: teams,
       globalLogs: globalLogs,
       pointRules: pointRules,
+      adminPasswordHash: serverAdminPasswordHash,
       updatedAt: new Date().toISOString()
     });
   } catch (e) {
