@@ -42,9 +42,11 @@ function getTeamBadgeClass(color) {
   }
 }
 
+let gameRules = [];
+
 // タブ切り替え
 window.switchTab = function(tab) {
-  ['ranking', 'teams'].forEach(t => {
+  ['ranking', 'teams', 'game-rules'].forEach(t => {
     document.getElementById(`sec-${t}`).classList.add('hidden');
     document.getElementById(`tab-${t}`).className = "py-2.5 rounded-md text-slate-400 hover:text-slate-200 transition";
   });
@@ -52,6 +54,59 @@ window.switchTab = function(tab) {
   document.getElementById(`sec-${tab}`).classList.remove('hidden');
   document.getElementById(`tab-${tab}`).className = "py-2.5 rounded-md bg-amber-500 text-slate-950 shadow transition";
 };
+
+// ルール絞り込み＆描画処理
+window.filterGameRules = function() {
+  const selectVal = document.getElementById('rule-filter-select').value;
+  const listContainer = document.getElementById('viewer-game-rules-list');
+  if (!listContainer) return;
+
+  listContainer.innerHTML = '';
+
+  const targetRules = selectVal === 'all' 
+    ? gameRules 
+    : gameRules.filter(r => r.id === selectVal);
+
+  if (targetRules.length === 0) {
+    listContainer.innerHTML = '<div class="text-slate-500 text-center py-6 text-xs italic">該当するルールはありません</div>';
+    return;
+  }
+
+  targetRules.forEach(gr => {
+    const card = document.createElement('div');
+    card.className = "bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-2 shadow-sm";
+    card.innerHTML = `
+      <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
+        <i class="fa-solid fa-scroll text-amber-400"></i>
+        <h3 class="font-bold text-sm text-amber-400">${escapeHtml(gr.title)}</h3>
+      </div>
+      <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">${escapeHtml(gr.desc)}</p>
+    `;
+    listContainer.appendChild(card);
+  });
+};
+
+// セレクトボックスの選択肢更新
+function updateRuleSelectOptions() {
+  const select = document.getElementById('rule-filter-select');
+  if (!select) return;
+  
+  const currentVal = select.value;
+  select.innerHTML = '<option value="all">すべてのルールを表示</option>';
+  
+  gameRules.forEach(gr => {
+    const opt = document.createElement('option');
+    opt.value = gr.id;
+    opt.textContent = gr.title;
+    select.appendChild(opt);
+  });
+
+  if (gameRules.some(r => r.id === currentVal)) {
+    select.value = currentVal;
+  } else {
+    select.value = 'all';
+  }
+}
 
 // 画面描画処理
 function render() {
@@ -146,6 +201,10 @@ function render() {
       logsContainer.appendChild(logItem);
     });
   }
+  
+  updateRuleSelectOptions();
+  filterGameRules();
+  
 }
 
 // Firestoreのデータをリアルタイムで監視・同期
@@ -155,8 +214,9 @@ onSnapshot(doc(db, "sabage", "mainData"), (docSnap) => {
     players = data.players || [];
     teams = data.teams || [];
     globalLogs = data.globalLogs || [];
+    gameRules = data.gameRules || [];
   }
   render();
 }, (error) => {
-  console.error("Firestore同期エラー: ", error);
+  console.error("同期エラー: ", error);
 });
