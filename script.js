@@ -72,6 +72,8 @@ let pointRules = [
   { id: 'r6', target: 'indiv', name: '特殊ミッション', pts: 5, icon: 'fa-star', color: 'purple' }
 ];
 
+let gameRules = [];
+
 // クラウド（Firestore）へデータを保存する処理
 async function saveData() {
   try {
@@ -80,6 +82,7 @@ async function saveData() {
       teams: teams,
       globalLogs: globalLogs,
       pointRules: pointRules,
+      gameRules: gameRules,
       adminPasswordHash: serverAdminPasswordHash,
       updatedAt: new Date().toISOString()
     });
@@ -110,7 +113,7 @@ function getTeamBadgeClass(color) {
 }
 
 window.switchTab = function(tab) {
-  ['score', 'ranking', 'teams', 'members', 'settings'].forEach(t => {
+  ['score', 'ranking', 'teams', 'members', 'game-rules', 'settings'].forEach(t => {
     document.getElementById(`sec-${t}`).classList.add('hidden');
     document.getElementById(`tab-${t}`).className = "py-2.5 rounded-md text-slate-400 hover:text-slate-200 transition";
   });
@@ -126,6 +129,69 @@ window.toggleTargetType = function() {
   
   document.getElementById('btn-group-team').classList.toggle('hidden', !isTeam);
   document.getElementById('btn-group-indiv').classList.toggle('hidden', isTeam);
+};
+
+// ゲームルールの保存（新規追加・編集共通）
+window.saveGameRule = function() {
+  const idInput = document.getElementById('edit-rule-id').value;
+  const title = document.getElementById('rule-title-input').value.trim();
+  const desc = document.getElementById('rule-desc-input').value.trim();
+
+  if (!title || !desc) {
+    return alert('タイトルと内容の両方を入力してください。');
+  }
+
+  if (idInput) {
+    // 編集
+    const rule = gameRules.find(r => r.id === idInput);
+    if (rule) {
+      rule.title = title;
+      rule.desc = desc;
+    }
+  } else {
+    // 新規追加
+    gameRules.push({
+      id: 'gr_' + Date.now(),
+      title: title,
+      desc: desc
+    });
+  }
+
+  cancelEditGameRule();
+  saveData();
+};
+
+// 編集モード呼び出し
+window.editGameRule = function(id) {
+  const rule = gameRules.find(r => r.id === id);
+  if (!rule) return;
+
+  document.getElementById('edit-rule-id').value = rule.id;
+  document.getElementById('rule-title-input').value = rule.title;
+  document.getElementById('rule-desc-input').value = rule.desc;
+  
+  document.getElementById('rule-form-title').textContent = 'ゲームルールの編集';
+  document.getElementById('rule-submit-btn').textContent = '更新する';
+  document.getElementById('rule-cancel-btn').classList.remove('hidden');
+};
+
+// 編集キャンセルの初期化
+window.cancelEditGameRule = function() {
+  document.getElementById('edit-rule-id').value = '';
+  document.getElementById('rule-title-input').value = '';
+  document.getElementById('rule-desc-input').value = '';
+  
+  document.getElementById('rule-form-title').textContent = '新規ゲームルールの追加';
+  document.getElementById('rule-submit-btn').textContent = '登録する';
+  document.getElementById('rule-cancel-btn').classList.add('hidden');
+};
+
+// ルール削除
+window.deleteGameRule = function(id) {
+  if (confirm('このゲームルールを削除しますか？')) {
+    gameRules = gameRules.filter(r => r.id !== id);
+    saveData();
+  }
 };
 
 function render() {
@@ -224,7 +290,6 @@ function render() {
       rankingList.appendChild(card);
     });
   }
-
   const teamsContainer = document.getElementById('teams-container');
   teamsContainer.innerHTML = '';
   if(teams.length === 0) {
@@ -331,6 +396,31 @@ function render() {
       `;
       logsContainer.appendChild(logItem);
     });
+  }
+  
+  // ゲームルール一覧描画（admin用）
+  const adminRulesList = document.getElementById('admin-game-rules-list');
+  if (adminRulesList) {
+    adminRulesList.innerHTML = '';
+    if (gameRules.length === 0) {
+      adminRulesList.innerHTML = '<div class="text-slate-500 italic text-xs">登録されたルールはありません</div>';
+    } else {
+      gameRules.forEach(gr => {
+        const item = document.createElement('div');
+        item.className = "bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-1.5";
+        item.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+            <span class="font-bold text-sm text-amber-400">${escapeHtml(gr.title)}</span>
+            <div class="flex items-center gap-2">
+              <button onclick="editGameRule('${gr.id}')" class="text-xs text-slate-400 hover:text-amber-400"><i class="fa-solid fa-pen"></i> 編集</button>
+              <button onclick="deleteGameRule('${gr.id}')" class="text-xs text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">${escapeHtml(gr.desc)}</p>
+        `;
+        adminRulesList.appendChild(item);
+      });
+    }
   }
 }
 
