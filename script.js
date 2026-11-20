@@ -640,7 +640,7 @@ window.resetPointsOnly = function() {
 };
 
 document.getElementById('reset-btn').addEventListener('click', () => {
-  if(confirm('【警告】すべての登録部員、チーム、ポイントをリセットして初期状態に戻しますか？')) {
+  if (confirm('【警告】すべての登録部員、チーム、ポイントをリセットしますか？（登録済みルールは維持されます）')) {
     players = [];
     teams = [
       { id: 'team_red', name: '赤チーム', color: 'red' },
@@ -650,6 +650,17 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     saveData();
   }
 });
+
+window.handleLogout = function() {
+  if (!confirm('ログアウトしますか？')) return;
+  sessionStorage.removeItem('admin_authenticated');
+  const passInput = document.getElementById('login-password');
+  const errorMsg = document.getElementById('login-error');
+  const loginModal = document.getElementById('login-modal');
+  if (passInput) passInput.value = '';
+  if (errorMsg) errorMsg.classList.add('hidden');
+  if (loginModal) loginModal.classList.remove('hidden');
+};
 
 // Firestoreのデータをリアルタイムで監視・同期
 onSnapshot(doc(db, "sabage", "mainData"), (docSnap) => {
