@@ -50,6 +50,23 @@ const firebaseConfig = {
   measurementId: "G-4XXCRZT4VZ"
 };
 
+window.toggleAdminMenu = function() {
+  const menu = document.getElementById('admin-header-menu');
+  const icon = document.getElementById('admin-menu-icon');
+  if (!menu) return;
+  const isHidden = menu.classList.toggle('hidden');
+  if (icon) {
+    icon.className = isHidden ? 'fa-solid fa-bars text-sm' : 'fa-solid fa-xmark text-sm';
+  }
+};
+
+window.closeAdminMenu = function() {
+  const menu = document.getElementById('admin-header-menu');
+  const icon = document.getElementById('admin-menu-icon');
+  if (menu) menu.classList.add('hidden');
+  if (icon) icon.className = 'fa-solid fa-bars text-sm';
+};
+
 // Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
